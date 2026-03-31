@@ -1,52 +1,26 @@
-import asyncio
-import sys
-from os import name, system
-
-from pystyle import Center
-
-from fakegen import gg, print_gradient_text
-from logic import *
-from numb import *
-from search import check_username, run_sherlock, run_holehe
-from tosgs import tosgs
-
-fsociety_title = """
- ███████████  █████████     ███████      █████████  █████ ██████████ ███████████ █████ █████
-▒▒███▒▒▒▒▒▒█ ███▒▒▒▒▒███  ███▒▒▒▒▒███   ███▒▒▒▒▒███▒▒███ ▒▒███▒▒▒▒▒█▒█▒▒▒███▒▒▒█▒▒███ ▒▒███ 
- ▒███   █ ▒ ▒███    ▒▒▒  ███     ▒▒███ ███     ▒▒▒  ▒███  ▒███  █ ▒ ▒   ▒███  ▒  ▒▒███ ███  
- ▒███████   ▒▒█████████ ▒███      ▒███▒███          ▒███  ▒██████       ▒███      ▒▒█████   
- ▒███▒▒▒█    ▒▒▒▒▒▒▒▒███▒███      ▒███▒███          ▒███  ▒███▒▒█       ▒███       ▒▒███    
- ▒███  ▒     ███    ▒███▒▒███     ███ ▒▒███     ███ ▒███  ▒███ ▒   █    ▒███        ▒███    
- █████      ▒▒█████████  ▒▒▒███████▒   ▒▒█████████  █████ ██████████    █████       █████   
-▒▒▒▒▒        ▒▒▒▒▒▒▒▒▒     ▒▒▒▒▒▒▒      ▒▒▒▒▒▒▒▒▒  ▒▒▒▒▒ ▒▒▒▒▒▒▒▒▒▒    ▒▒▒▒▒       ▒▒▒▒▒    
-                                                                                            
-                                                                                            """
-dnint = """
-╔══════════════════════════════════════════════════════════════════════════════════════╗
-║ 1. DNS Lookup             12. GitHub parsing          24. Generate phone             ║
-║ 3. IP Lookup              13. Download video YT       25. Get Databases              ║
-║ 4. Image Metadata         14. Generated QR            26. Phone Full Info            ║
-║ 5. Data Breach Lookup     15. Internet speedtest      27. Phone Validator            ║
-║ 6. Port Scan              16. Generate password       28. Phone Formatter            ║
-║ 7. URL Avail. Check       17. Transform text          29. Phone Geo/Carrier          ║
-║ 8. SSL Cert Check         18. Scan single port        30. Extract Phones             ║
-║ 9. HTTP Headers           19. Get proxy list          31. Phone Examples             ║
-║ 10. Response Time         20. MAC lookup              32. Supported Regions          ║
-║ 11. HTML Parsing          21. Crawl website           33. Generator Tool             ║
-║ 36. Search by nickname    22. Generate person         34. Telegram Gift Parser       ║
-║ 37. Search by mail        23. Generate card           35. Search by nickname v2      ║
-║══════════════════════════════════════════════════════════════════════════════════════║
-║                                 0. Leave                                             ║
-╚══════════════════════════════════════════════════════════════════════════════════════╝
-"""
+from asyncio import run
+from sys import exit
+from osint.dnint import dns_lookup, ip_lookup, image_metadata, data_breach_lookup, port_scan, url_availability_check, \
+    ssl_certificate_check, http_headers_extraction, server_response_time_check, html_parser, github_repo_parser, \
+    download_youtube_video, transform_text, check_internet_speed, getdb, s_port, mac_lookup, crawl_website, \
+    get_proxy_list
+from osint.tools.utils import cls
+from pystyle import Center, Colorate, Colors
+from osint.tools.settings import fsociety_title, variants
+from osint.tools.gen import gg, print_gradient_text
+from osint.tools.numb import *
+from osint.socmint import check_username, run_sherlock
+from osint.emailint import run_holehe
+from osint.tools.tosgs import tosgs
+from osint.tools.gen import generate_qr_code, gen_pass, generate_random_person, generate_card, generate_phone_number
 
 def main():
-    system('cls' if name == 'nt' else 'clear')
+    cls()
     print_gradient_text(Center.XCenter(fsociety_title))
-    print_gradient_text(Center.XCenter(dnint))
+    print_gradient_text(Center.XCenter(variants))
     print()
     match input("---> ").strip():
-        case '0': print("Exiting the program."); sys.exit(0)
+        case '0': print("Exiting the program."); exit(0)
         case '1': dns_lookup(input("Enter domain for DNS lookup: "))
         case '3': ip_lookup(input("Enter IP for IP lookup: "))
         case '4': image_metadata(input("Enter path to image for metadata extraction: "))
@@ -61,16 +35,16 @@ def main():
         case '13': download_youtube_video(input("Enter YouTube video URL: "))
         case '14': generate_qr_code()
         case '15': check_internet_speed()
-        case '16': print(generate_password(int(input("Password length: ")), input("Strength (low/medium/high): ")))
+        case '16': print(gen_pass(int(input("Password length: ")), input("Strength (low/medium/high): ")))
         case '17': print(transform_text(input("Enter text: ")))
         case '18': print("Open" if s_port(input("Enter port: "), input("Enter host (default 127.0.0.1): ") or "127.0.0.1") else "Closed")
         case '25': getdb()
         case '33': gg()
-        case '34': asyncio.run(tosgs())
+        case '34': run(tosgs())
         case '20': print(mac_lookup(input("Enter MAC address: ")))
         case '21': print("\n".join(crawl_website(input("Enter start URL: "))[:20]))
         case '35':
-            result = asyncio.run(check_username(input("Username --> "), 500))
+            result = run(check_username(input("Username --> "), 500))
             print(Colorate.Horizontal(Colors.blue_to_cyan, result))
 
         case '36':

@@ -1,14 +1,12 @@
 import socket
-
-import time
 from datetime import datetime
 from hashlib import md5
 from os import path, getcwd, makedirs, listdir
-from random import choice, randint
+from random import choice
 from re import sub
 from socket import socket, AF_INET, SOCK_STREAM
 from ssl import get_server_certificate
-from string import ascii_letters, digits, punctuation
+from time import sleep, time
 from urllib import parse
 
 from OpenSSL import crypto
@@ -16,34 +14,13 @@ from PIL import Image
 from PIL.ExifTags import TAGS
 from bs4 import BeautifulSoup
 from dns.resolver import Resolver, NXDOMAIN
-from faker import Faker
 from pystyle import Colors, Colorate
 from pytube import YouTube
-from qrcode import QRCode, constants
-from requests import get
-from requests import head, ConnectionError, RequestException, exceptions
+from requests import head, ConnectionError, RequestException, exceptions, get
 from speedtest import Speedtest
-
-links = {
-    "raw.githubusercontent.com/srusahi/femoz/e44adac46e8a2f4d38c974cee092671700844f82/Base/God_eye_basedata.txt",
-    "raw.githubusercontent.com/Karen-HUB-git/STRANGER_PRIVATE2/2af0f86f29037bf9abbe3b130a5c988d8ebe3f70/PAS1k.txt",
-    "github.com/shikso81/honkai/raw/eb2fe07682823684c200ac14acf3384175dcb840/NatHack/database/QiWi.csv",
-    "github.com/shikso81/honkai/raw/eb2fe07682823684c200ac14acf3384175dcb840/NatHack/database/russol.info.csv",
-    "drive.google.com/drive/folders/1YZYHUV3f8sgW6PQOqjCWmNWvKIxC5u0D"
-}
-
-translit_dict = {
-    "а": "@", "б": "Б", "в": "B", "г": "г", "д": "д", "е": "е", "ё": "ё", "ж": "ж", "з": "3", "и": "u",
-    "й": "й", "к": "K", "л": "л", "м": "M", "н": "H", "о": "0", "п": "п", "р": "P", "с": "c", "т": "T",
-    "у": "y", "ф": "ф", "х": "X", "ц": "ц", "ч": "4", "ш": "ш", "щ": "щ", "ъ": "ъ", "ы": "ы", "ь": "ь",
-    "э": "э", "ю": "ю", "я": "я", "А": "A", "Б": "6", "В": "V", "Г": "r", "Д": "D", "Е": "E", "Ё": "Ё",
-    "Ж": "Ж", "З": "2", "И": "I", "Й": "Й", "К": "K", "Л": "Л", "М": "M", "Н": "H", "О": "O", "П": "П",
-    "Р": "P", "С": "C", "Т": "T", "У": "Y", "Ф": "Ф", "Х": "X", "Ц": "Ц", "Ч": "Ч", "Ш": "Ш", "Щ": "Щ",
-    "Ъ": "Ъ", "Ы": "bl", "Ь": "b", "Э": "Э", "Ю": "9Y", "Я": "9A",
-}
+from osint.tools.settings import translit_dict, links
 
 def sanitize_filename(filename): return sub(r'[\\/*?:"<>|]', "_", filename)
-def generate_password(n, s): return ''.join(choice(get_characters(s)) for _ in range(n))
 def transform_text(t): return ''.join(translit_dict.get(c, c) for c in t)
 def getdb(): print("Your databases:"); print(*[f"- {l}" for l in links], sep="\n")
 
@@ -201,8 +178,8 @@ def http_headers_extraction(url):
 
 def server_response_time_check(url):
     try:
-        start_time = time.time()
-        end_time = time.time()
+        start_time = time()
+        end_time = time()
         response_time = end_time - start_time
         print(f"Server response time for {url}: {response_time} seconds")
     except Exception as e:
@@ -238,7 +215,7 @@ def html_parser(url):
             if status_code == 429:
                 if attempt < max_retries - 1:
                     print(f"Failed to parse HTML for {url}: {e}. Retrying in {retry_delay} seconds...")
-                    time.sleep(retry_delay)
+                    sleep(retry_delay)
                 else:
                     print(f"Failed to parse HTML for {url}: {e}. Max retries reached.")
             else:
@@ -343,18 +320,6 @@ def choose_file_from_directory():
             print("Неверный ввод. Пожалуйста, введите корректное число.")
 
 
-def generate_qr_code():
-    data = input("Enter the data to encode in the QR code: ")
-    qr = QRCode(version=1, error_correction=constants.ERROR_CORRECT_L, box_size=10, border=4,)
-    qr.add_data(data)
-    qr.make(fit=True)
-    img = qr.make_image(fill='black', back_color='white')
-    file_path = "qrcode.png"
-    img.save(file_path)
-    print(f"QR code saved as {file_path}")
-    input("Press Enter to return to the menu...")
-
-
 def check_internet_speed():
     st = Speedtest()
     st.download()
@@ -375,10 +340,6 @@ def download_youtube_video(url):
         print("Download completed.")
     except Exception as e: print(f"An error occurred: {e}")
 
-
-def get_characters(s):
-    c = ascii_letters + digits
-    return c + ("!@#$%^&*()qwertyuiopasdfghjklzxcvbnm,./;[]йцукенгшщзхъфывапролдячсмить" if s=="medium" else punctuation if s=="high" else "")
 
 def s_port(p, host="127.0.0.1"):
     s = socket(AF_INET, SOCK_STREAM)
@@ -439,73 +400,3 @@ def crawl_website(start_url, max_depth=2):
 
     crawl(start_url)
     return results
-
-
-def generate_random_person(gender=None):
-    fake = Faker(locale="ru_RU")
-    if gender is None:
-        gender = choice(["М", "Ж"])
-    if gender == "М":
-        first_name = fake.first_name_male()
-        middle_name = fake.middle_name_male()
-    else:
-        first_name = fake.first_name_female()
-        middle_name = fake.middle_name_female()
-    last_name = fake.last_name()
-    full_name = f"{last_name} {first_name} {middle_name}"
-    birthdate = fake.date_of_birth()
-    age = fake.random_int(min=18, max=80)
-    street_address = fake.street_address()
-    city = fake.city()
-    region = fake.region()
-    postcode = fake.postcode()
-    address = f"{street_address}, {city}, {region} {postcode}"
-    email = fake.email()
-    phone_number = fake.phone_number()
-    inn = str(fake.random_number(digits=12, fix_len=True))
-    snils = str(fake.random_number(digits=11, fix_len=True))
-    passport_num = str(fake.random_number(digits=10, fix_len=True))
-    passport_series = fake.random_int(min=1000, max=9999)
-    return {
-        "ФИО": full_name,
-        "Пол": gender,
-        "Дата рождения": birthdate.strftime('%d %B %Y'),
-        "Возраст": age,
-        "Адрес": address,
-        "Email": email,
-        "Телефон": phone_number,
-        "ИНН": inn,
-        "СНИЛС": snils,
-        "Паспорт": f"{passport_series} {passport_num}"
-    }
-
-
-def generate_checksum(n):
-    d = list(map(int, n))
-    s = sum(d[-2::-2]) + sum(sum(divmod(x*2, 10)) for x in d[-1::-2])
-    return (10 - s % 10) % 10
-
-
-def generate_card_number():
-    n = "4" + ''.join(str(randint(0,9)) for _ in range(14))
-    return n + str(generate_checksum(n))
-
-
-def generate_card(country="Россия"):
-    m, y = randint(1,12), randint(24,30)
-    return {
-        "Страна": country,
-        "Номер карты": generate_card_number(),
-        "Срок действия": f"{m:02d}/{y:02d}",
-        "CVV": ''.join(str(randint(0,9)) for _ in range(3))
-    }
-
-
-def generate_phone_number(c):
-    return {
-        "1": f"+1 {randint(200,999)}-{randint(200,999)}-{randint(1000,9999)}",
-        "2": f"+7 {randint(900,999)} {randint(100,999)}-{randint(10,99)}-{randint(10,99)}",
-        "3": f"+7 {randint(700,709)} {randint(100,999)}-{randint(10,99)}-{randint(10,99)}",
-        "4": f"+375 {randint(25,33)} {randint(100,999)}-{randint(100,999)}",
-        "5": f"+234 {randint(700,799)} {randint(100,999)}-{randint(1000,9999)}"
-    }.get(c)

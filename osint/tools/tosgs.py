@@ -1,10 +1,8 @@
 from asyncio import sleep
 from json import dump, load
 from os import listdir, makedirs
-from os import system, name
 from re import findall
 from httpx import AsyncClient
-from pystyle import Colorate, Colors
 from qrcode import QRCode
 from telethon import (
     types,
@@ -13,42 +11,14 @@ from telethon import (
     errors
 )
 from tqdm.asyncio import tqdm
-
-api_id = 21341528
-api_hash = "bf654fd64259c65b85c8899ff081a437"
-session_name = 'tosgs'
-folder_json = 'found'
-path_json = f'{folder_json}/ids.json'
-path_nft_json = f'{folder_json}/nft_ids.json'
-url = 'https://cdn.changes.tg/gifts/originals/'
-nft_ids = []
-title = """
- ███████████  █████████     ███████      █████████  █████ ██████████ ███████████ █████ █████
-▒▒███▒▒▒▒▒▒█ ███▒▒▒▒▒███  ███▒▒▒▒▒███   ███▒▒▒▒▒███▒▒███ ▒▒███▒▒▒▒▒█▒█▒▒▒███▒▒▒█▒▒███ ▒▒███ 
- ▒███   █ ▒ ▒███    ▒▒▒  ███     ▒▒███ ███     ▒▒▒  ▒███  ▒███  █ ▒ ▒   ▒███  ▒  ▒▒███ ███  
- ▒███████   ▒▒█████████ ▒███      ▒███▒███          ▒███  ▒██████       ▒███      ▒▒█████   
- ▒███▒▒▒█    ▒▒▒▒▒▒▒▒███▒███      ▒███▒███          ▒███  ▒███▒▒█       ▒███       ▒▒███    
- ▒███  ▒     ███    ▒███▒▒███     ███ ▒▒███     ███ ▒███  ▒███ ▒   █    ▒███        ▒███    
- █████      ▒▒█████████  ▒▒▒███████▒   ▒▒█████████  █████ ██████████    █████       █████   
-▒▒▒▒▒        ▒▒▒▒▒▒▒▒▒     ▒▒▒▒▒▒▒      ▒▒▒▒▒▒▒▒▒  ▒▒▒▒▒ ▒▒▒▒▒▒▒▒▒▒    ▒▒▒▒▒       ▒▒▒▒▒    
-
-                                                                                                    """
-menu = """
-1. Parser
-2. Send Gift
-3. Utility
-4. NFT Parsing
-5. Register
-0. Leave
-
-"""
+from osint.tools.settings import session_name, tosgs_menu, tosgs_title, url, api_id, api_hash, path_json, path_nft_json, nft_ids, folder_json
+from osint.tools.utils import cls, print_gradient, save
 
 def get_sessions(): return sorted([f.replace('session_', '').replace('.session', '') for f in listdir('TOSGS') if f.startswith('session_') and f.endswith('.session')])
 async def get_invoice(peer, g_id): return types.InputInvoiceStarGift(hide_name=False, include_upgrade=False, peer=peer, gift_id=g_id, message=types.TextWithEntities(text="", entities=[]))
 async def get_all_gifts_not_hidden(client): return await client(functions.payments.GetStarGiftsRequest(hash=0))
 async def get_client_not_started(S_NAME): return TelegramClient(session=f'session_{S_NAME}', api_id=api_id, api_hash=api_hash, device_model="iPhone 5s", system_version="12.5.8")
 async def payment_request(invoice, client): return await client(functions.payments.GetPaymentFormRequest(invoice=invoice, theme_params=None))
-def print_gradient(text): print(Colorate.Vertical(Colors.blue_to_cyan, text))
 
 async def get_all_gifts_ids():
     async with AsyncClient() as client:
@@ -193,10 +163,6 @@ async def info_gifts():
     with open(path_json, "w", encoding="utf-8") as f: dump(available_ids, f, indent=4)
     await client.disconnect()
 
-
-async def save(path, data):
-    with open(path, "w", encoding="utf-8") as f: dump(data, f, ensure_ascii=False, indent=4)
-
 async def runly():
     client = await get_client(session_name)
     result = await get_all_gifts_not_hidden(client)
@@ -211,9 +177,9 @@ async def runly():
 
 async def tosgs():
     while True:
-        system('cls' if name == 'nt' else 'clear')
-        print_gradient(title)
-        print_gradient(menu)
+        cls()
+        print_gradient(tosgs_title)
+        print_gradient(tosgs_menu)
 
         match input(">>> "):
             case "1": await info_gifts()
