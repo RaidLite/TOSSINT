@@ -1,14 +1,15 @@
 import asyncio
 import sys
-from itertools import zip_longest
 from os import name, system
-from fakegen import gg
+
+from pystyle import Center
+
+from fakegen import gg, print_gradient_text
 from logic import *
 from numb import *
-from search import check_username
+from search import check_username, run_sherlock, run_holehe
 from tosgs import tosgs
 
-color = Colors.blue_to_cyan
 fsociety_title = """
  ███████████  █████████     ███████      █████████  █████ ██████████ ███████████ █████ █████
 ▒▒███▒▒▒▒▒▒█ ███▒▒▒▒▒███  ███▒▒▒▒▒███   ███▒▒▒▒▒███▒▒███ ▒▒███▒▒▒▒▒█▒█▒▒▒███▒▒▒█▒▒███ ▒▒███ 
@@ -20,89 +21,32 @@ fsociety_title = """
 ▒▒▒▒▒        ▒▒▒▒▒▒▒▒▒     ▒▒▒▒▒▒▒      ▒▒▒▒▒▒▒▒▒  ▒▒▒▒▒ ▒▒▒▒▒▒▒▒▒▒    ▒▒▒▒▒       ▒▒▒▒▒    
                                                                                             
                                                                                             """
-dnint = [
-    "--- DNINT",
-    "1. DNS Lookup",
-    "3. IP Lookup",
-    "6. Port Scan",
-    "18. Scan single port",
-    "19. Get proxy list",
-    "20. MAC lookup",
-]
-
-web = ["--- Web analytics",
-       "7. URL Availability Check",
-       "8. SSL Certificate Check",
-       "9. HTTP Headers Extraction",
-       "10. Server Response Time Check",
-       "11. HTML Parsing",
-       "21. Crawl website"]
-
-telint = [
-    "--- TELINT",
-    "26. Phone Full Info",
-    "27. Phone Validator",
-    "28. Phone Formatter",
-    "29. Phone Geo/Carrier",
-    "30. Extract Phones from Text"
-]
-
-data_breaches = [
-    "--- Data Breaches",
-    "4. Image Metadata",
-    "5. Data Breach Lookup",
-    "25. Get Databases"
-]
-
-socmint = ["--- SOCMINT",
-           "12. GitHub repository parsing",
-           "13. Download video Youtube"
-]
-
-other = ["--- OTHER",
-         "q. Leave",
-         "14. Generated QR",
-         "15. Internet speedtest",
-         "16. Generate password",
-         "17. Transform text",
-         "22. Generate person",
-         "23. Generate card",
-         "24. Generate phone",
-         "31. Phone Examples",
-         "32. Supported Regions",
-         "33. Generator Tool",
-         "34. Telegram Gift Parser",
-         "35. Search by nickname"
-]
-
-
-def print_table(*columns):
-    widths = [max(len(str(item)) for item in col) for col in columns]
-    for row_data in zip_longest(*columns, fillvalue=""):
-        formatted_row = []
-        for i, item in enumerate(row_data):
-            cell = str(item).ljust(widths[i])
-            formatted_row.append(cell)
-
-        text = f" {f' |  '.join(formatted_row) + ' '} "
-        print(Colorate.Horizontal(color, text))
-
+dnint = """
+╔══════════════════════════════════════════════════════════════════════════════════════╗
+║ 1. DNS Lookup             12. GitHub parsing          24. Generate phone             ║
+║ 3. IP Lookup              13. Download video YT       25. Get Databases              ║
+║ 4. Image Metadata         14. Generated QR            26. Phone Full Info            ║
+║ 5. Data Breach Lookup     15. Internet speedtest      27. Phone Validator            ║
+║ 6. Port Scan              16. Generate password       28. Phone Formatter            ║
+║ 7. URL Avail. Check       17. Transform text          29. Phone Geo/Carrier          ║
+║ 8. SSL Cert Check         18. Scan single port        30. Extract Phones             ║
+║ 9. HTTP Headers           19. Get proxy list          31. Phone Examples             ║
+║ 10. Response Time         20. MAC lookup              32. Supported Regions          ║
+║ 11. HTML Parsing          21. Crawl website           33. Generator Tool             ║
+║ 36. Search by nickname    22. Generate person         34. Telegram Gift Parser       ║
+║ 37. Search by mail        23. Generate card           35. Search by nickname v2      ║
+║══════════════════════════════════════════════════════════════════════════════════════║
+║                                 0. Leave                                             ║
+╚══════════════════════════════════════════════════════════════════════════════════════╝
+"""
 
 def main():
     system('cls' if name == 'nt' else 'clear')
-    print(Colorate.Vertical(color, fsociety_title))
+    print_gradient_text(Center.XCenter(fsociety_title))
+    print_gradient_text(Center.XCenter(dnint))
     print()
-    print_table(
-        dnint,
-        web,
-        telint,
-        data_breaches,
-        socmint,
-        other
-    )
-    print()
-    match input("Enter your choice: ").strip():
-        case 'q': print("Exiting the program."); sys.exit(0)
+    match input("---> ").strip():
+        case '0': print("Exiting the program."); sys.exit(0)
         case '1': dns_lookup(input("Enter domain for DNS lookup: "))
         case '3': ip_lookup(input("Enter IP for IP lookup: "))
         case '4': image_metadata(input("Enter path to image for metadata extraction: "))
@@ -127,7 +71,49 @@ def main():
         case '21': print("\n".join(crawl_website(input("Enter start URL: "))[:20]))
         case '35':
             result = asyncio.run(check_username(input("Username --> "), 500))
-            print(Colorate.Horizontal(color, result))
+            print(Colorate.Horizontal(Colors.blue_to_cyan, result))
+
+        case '36':
+            nickname = input("Nickname: ")
+            data = run_sherlock(nickname)
+
+            if "error" in data:
+                result = f"[-] Error for {nickname}: {data['error']}"
+            else:
+                found_count = data["data"]["found_count"]
+                accounts = data["data"]["accounts"]
+
+                if found_count > 0:
+                    header = f"[*] Results for '{nickname}' ({found_count} found):\n"
+                    links = "\n".join([f" > {site}: {url}" for site, url in accounts.items()])
+                    result = header + links
+                else:
+                    result = f"[-] No accounts found for '{nickname}'."
+
+            print(Colorate.Horizontal(Colors.blue_to_cyan, result))
+
+        case '37':
+            email = input("Email: ")
+            data = run_holehe(email)
+
+            if "error" in data:
+                result = f"[-] Error: {data['error']}"
+            else:
+                found = data["data"]["found"]
+                limited = data["data"]["rate_limited"]
+
+                if found:
+                    res_list = [f" > {i['service']}" +
+                                (f" ({i['recovery'] or i['phone']})" if i['recovery'] or i['phone'] else "")
+                                for i in found]
+                    result = f"[*] Found {len(found)} accounts for {email}:\n" + "\n".join(res_list)
+                    if limited:
+                        result += f"\n[!] Rate Limit: {', '.join(limited)}"
+                else:
+                    result = f"[-] No data for {email}."
+
+            print(Colorate.Horizontal(Colors.blue_to_cyan, result))
+
 
         case '19':
             proxies = get_proxy_list()

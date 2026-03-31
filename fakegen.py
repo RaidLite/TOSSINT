@@ -132,9 +132,7 @@ def print_menu():
 def gg():
     while True:
         print_menu()
-        option = input("Выберите опцию: ")
-
-        match option:
+        match input("---> "):
             case '1': print("Сгенерированный пароль:", generate_password())
             case '2':
                 country_code = input("Введите код страны: ")
@@ -167,9 +165,7 @@ def gg():
             case '25': print("Сгенерированный профиль акции:", generate_stock_profile())
             case '26': print("Сгенерированное медицинское портфолио:", generate_medical_profile())
             case '27': print("Сгенерированные паспортные данные:", generate_passport_details())
-            case '28':
-                print("Выход")
-                break
+            case '28': break
             case _: print("Неверная опция. Пожалуйста, выберите снова.")
 
         input("Нажмите Enter для продолжения...")
