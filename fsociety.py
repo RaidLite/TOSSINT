@@ -1,15 +1,25 @@
 import asyncio
 import sys
 from itertools import zip_longest
-
-import tosu
+from os import name, system
 from fakegen import gg
 from logic import *
 from numb import *
+from search import check_username
 from tosgs import tosgs
 
 color = Colors.blue_to_cyan
-
+fsociety_title = """
+ ███████████  █████████     ███████      █████████  █████ ██████████ ███████████ █████ █████
+▒▒███▒▒▒▒▒▒█ ███▒▒▒▒▒███  ███▒▒▒▒▒███   ███▒▒▒▒▒███▒▒███ ▒▒███▒▒▒▒▒█▒█▒▒▒███▒▒▒█▒▒███ ▒▒███ 
+ ▒███   █ ▒ ▒███    ▒▒▒  ███     ▒▒███ ███     ▒▒▒  ▒███  ▒███  █ ▒ ▒   ▒███  ▒  ▒▒███ ███  
+ ▒███████   ▒▒█████████ ▒███      ▒███▒███          ▒███  ▒██████       ▒███      ▒▒█████   
+ ▒███▒▒▒█    ▒▒▒▒▒▒▒▒███▒███      ▒███▒███          ▒███  ▒███▒▒█       ▒███       ▒▒███    
+ ▒███  ▒     ███    ▒███▒▒███     ███ ▒▒███     ███ ▒███  ▒███ ▒   █    ▒███        ▒███    
+ █████      ▒▒█████████  ▒▒▒███████▒   ▒▒█████████  █████ ██████████    █████       █████   
+▒▒▒▒▒        ▒▒▒▒▒▒▒▒▒     ▒▒▒▒▒▒▒      ▒▒▒▒▒▒▒▒▒  ▒▒▒▒▒ ▒▒▒▒▒▒▒▒▒▒    ▒▒▒▒▒       ▒▒▒▒▒    
+                                                                                            
+                                                                                            """
 dnint = [
     "--- DNINT",
     "1. DNS Lookup",
@@ -46,7 +56,8 @@ data_breaches = [
 
 socmint = ["--- SOCMINT",
            "12. GitHub repository parsing",
-           "13. Download video Youtube"]
+           "13. Download video Youtube"
+]
 
 other = ["--- OTHER",
          "q. Leave",
@@ -61,7 +72,7 @@ other = ["--- OTHER",
          "32. Supported Regions",
          "33. Generator Tool",
          "34. Telegram Gift Parser",
-         "35. Telegram UserBot"
+         "35. Search by nickname"
 ]
 
 
@@ -78,18 +89,8 @@ def print_table(*columns):
 
 
 def main():
-    os.system('cls' if os.name == 'nt' else 'clear')
-    print(Colorate.Vertical(color, """
- ███████████  █████████     ███████      █████████  █████ ██████████ ███████████ █████ █████
-▒▒███▒▒▒▒▒▒█ ███▒▒▒▒▒███  ███▒▒▒▒▒███   ███▒▒▒▒▒███▒▒███ ▒▒███▒▒▒▒▒█▒█▒▒▒███▒▒▒█▒▒███ ▒▒███ 
- ▒███   █ ▒ ▒███    ▒▒▒  ███     ▒▒███ ███     ▒▒▒  ▒███  ▒███  █ ▒ ▒   ▒███  ▒  ▒▒███ ███  
- ▒███████   ▒▒█████████ ▒███      ▒███▒███          ▒███  ▒██████       ▒███      ▒▒█████   
- ▒███▒▒▒█    ▒▒▒▒▒▒▒▒███▒███      ▒███▒███          ▒███  ▒███▒▒█       ▒███       ▒▒███    
- ▒███  ▒     ███    ▒███▒▒███     ███ ▒▒███     ███ ▒███  ▒███ ▒   █    ▒███        ▒███    
- █████      ▒▒█████████  ▒▒▒███████▒   ▒▒█████████  █████ ██████████    █████       █████   
-▒▒▒▒▒        ▒▒▒▒▒▒▒▒▒     ▒▒▒▒▒▒▒      ▒▒▒▒▒▒▒▒▒  ▒▒▒▒▒ ▒▒▒▒▒▒▒▒▒▒    ▒▒▒▒▒       ▒▒▒▒▒    
-                                                                                            
-                                                                                            """))
+    system('cls' if name == 'nt' else 'clear')
+    print(Colorate.Vertical(color, fsociety_title))
     print()
     print_table(
         dnint,
@@ -100,108 +101,47 @@ def main():
         other
     )
     print()
-    choice = input("Enter your choice: ").strip()
-
-    match choice:
-        case 'q':
-            print("Exiting the program.")
-            sys.exit(0)
-
-        case '1':
-            domain = input("Enter domain for DNS lookup: ")
-            dns_lookup(domain)
-
-        case '3':
-            ip = input("Enter IP for IP lookup: ")
-            ip_lookup(ip)
-
-        case '4':
-            image_path = input("Enter path to image for metadata extraction: ")
-            image_metadata(image_path)
-
-        case '5':
-            email = input("Enter email for data breach lookup: ")
-            data_breach_lookup(email)
-
-        case '6':
-            ip = input("Enter IP for port scan: ")
-            port_scan(ip)
-
-        case '7':
-            url = input("Enter URL for availability check: ")
-            url_availability_check(url)
-
-        case '8':
-            url = input("Enter URL for SSL certificate check: ")
-            ssl_certificate_check(url)
-
-        case '9':
-            url = input("Enter URL for HTTP headers extraction: ")
-            http_headers_extraction(url)
-
-        case '10':
-            url = input("Enter URL for server response time check: ")
-            server_response_time_check(url)
-
-        case '11':
-            url = input("Enter URL for HTML parsing: ")
-            html_parser(url)
-
-        case '12':
-            repo_url = input("Enter GitHub repository URL: ")
-            github_repo_parser(repo_url)
-
-        case '13':
-            url = input("Enter YouTube video URL: ")
-            download_youtube_video(url)
-
-        case '14':
-            generate_qr_code()
-        case '15':
-            check_internet_speed()
-        case '16':
-            length = int(input("Password length: "))
-            strength = input("Strength (low/medium/high): ")
-            print(generate_password(length, strength))
-
-        case '17':
-            text = input("Enter text: ")
-            print(transform_text(text))
-
-        case '18':
-            host = input("Enter host (default 127.0.0.1): ") or "127.0.0.1"
-            port = input("Enter port: ")
-            print("Open" if scan_port(port, host) else "Closed")
+    match input("Enter your choice: ").strip():
+        case 'q': print("Exiting the program."); sys.exit(0)
+        case '1': dns_lookup(input("Enter domain for DNS lookup: "))
+        case '3': ip_lookup(input("Enter IP for IP lookup: "))
+        case '4': image_metadata(input("Enter path to image for metadata extraction: "))
+        case '5': data_breach_lookup(input("Enter email for data breach lookup: "))
+        case '6': port_scan(input("Enter IP for port scan: "))
+        case '7': url_availability_check(input("Enter URL for availability check: "))
+        case '8': ssl_certificate_check(input("Enter URL for SSL certificate check: "))
+        case '9': http_headers_extraction(input("Enter URL for HTTP headers extraction: "))
+        case '10': server_response_time_check(input("Enter URL for server response time check: "))
+        case '11': html_parser(input("Enter URL for HTML parsing: "))
+        case '12': github_repo_parser(input("Enter GitHub repository URL: "))
+        case '13': download_youtube_video(input("Enter YouTube video URL: "))
+        case '14': generate_qr_code()
+        case '15': check_internet_speed()
+        case '16': print(generate_password(int(input("Password length: ")), input("Strength (low/medium/high): ")))
+        case '17': print(transform_text(input("Enter text: ")))
+        case '18': print("Open" if s_port(input("Enter port: "), input("Enter host (default 127.0.0.1): ") or "127.0.0.1") else "Closed")
+        case '25': getdb()
+        case '33': gg()
+        case '34': asyncio.run(tosgs())
+        case '20': print(mac_lookup(input("Enter MAC address: ")))
+        case '21': print("\n".join(crawl_website(input("Enter start URL: "))[:20]))
+        case '35':
+            result = asyncio.run(check_username(input("Username --> "), 500))
+            print(Colorate.Horizontal(color, result))
 
         case '19':
             proxies = get_proxy_list()
             print("\n".join(proxies[:10]) if isinstance(proxies, list) else proxies)
 
-        case '20':
-            mac = input("Enter MAC address: ")
-            print(mac_lookup(mac))
-
-        case '21':
-            url = input("Enter start URL: ")
-            results = crawl_website(url)
-            print("\n".join(results[:20]))
-
         case '22':
             gender = input("Gender (М/Ж or empty): ") or None
             person = generate_random_person(gender)
-            for k, v in person.items():
-                print(f"{k}: {v}")
+            for k, v in person.items(): print(f"{k}: {v}")
 
         case '23':
-            card = generate_card()
-            for k, v in card.items():
-                print(f"{k}: {v}")
+            for k, v in generate_card().items(): print(f"{k}: {v}")
 
-        case '24':
-            code = input("Country code (1-5): ")
-            print(generate_phone_number(code))
-        case '25':
-            getdb()
+        case '24': print(generate_phone_number(input("Country code (1-5): ")))
         case '26':
             num = input("Number: ")
             p = parse_safe(num)
@@ -248,21 +188,10 @@ def main():
             print(f"Regions: {get_supported_regions()}")
             print(f"Codes: {get_supported_calling_codes()}")
 
-        case '33':
-            gg()
-
-        case '34':
-            asyncio.run(tosgs())
-
-        case '35':
-            asyncio.run(tosu.userbot())
-
-        case _:
-            print("Invalid choice. Please select a valid option.")
+        case _: print("Invalid choice. Please select a valid option.")
 
     input("Press Enter to continue...")
 
 
 if __name__ == "__main__":
-    while True:
-        main()
+    while True: main()

@@ -1,9 +1,8 @@
-import os
 from asyncio import sleep
 from json import dump, load
 from os import listdir, makedirs
+from os import system, name
 from re import findall
-
 from httpx import AsyncClient
 from pystyle import Colorate, Colors
 from qrcode import QRCode
@@ -22,17 +21,34 @@ folder_json = 'found'
 path_json = f'{folder_json}/ids.json'
 path_nft_json = f'{folder_json}/nft_ids.json'
 url = 'https://cdn.changes.tg/gifts/originals/'
-
 nft_ids = []
+title = """
+ ███████████  █████████     ███████      █████████  █████ ██████████ ███████████ █████ █████
+▒▒███▒▒▒▒▒▒█ ███▒▒▒▒▒███  ███▒▒▒▒▒███   ███▒▒▒▒▒███▒▒███ ▒▒███▒▒▒▒▒█▒█▒▒▒███▒▒▒█▒▒███ ▒▒███ 
+ ▒███   █ ▒ ▒███    ▒▒▒  ███     ▒▒███ ███     ▒▒▒  ▒███  ▒███  █ ▒ ▒   ▒███  ▒  ▒▒███ ███  
+ ▒███████   ▒▒█████████ ▒███      ▒███▒███          ▒███  ▒██████       ▒███      ▒▒█████   
+ ▒███▒▒▒█    ▒▒▒▒▒▒▒▒███▒███      ▒███▒███          ▒███  ▒███▒▒█       ▒███       ▒▒███    
+ ▒███  ▒     ███    ▒███▒▒███     ███ ▒▒███     ███ ▒███  ▒███ ▒   █    ▒███        ▒███    
+ █████      ▒▒█████████  ▒▒▒███████▒   ▒▒█████████  █████ ██████████    █████       █████   
+▒▒▒▒▒        ▒▒▒▒▒▒▒▒▒     ▒▒▒▒▒▒▒      ▒▒▒▒▒▒▒▒▒  ▒▒▒▒▒ ▒▒▒▒▒▒▒▒▒▒    ▒▒▒▒▒       ▒▒▒▒▒    
+
+                                                                                                    """
+menu = """
+1. Parser
+2. Send Gift
+3. Utility
+4. NFT Parsing
+5. Register
+0. Leave
+
+"""
 
 def get_sessions(): return sorted([f.replace('session_', '').replace('.session', '') for f in listdir('TOSGS') if f.startswith('session_') and f.endswith('.session')])
 async def get_invoice(peer, g_id): return types.InputInvoiceStarGift(hide_name=False, include_upgrade=False, peer=peer, gift_id=g_id, message=types.TextWithEntities(text="", entities=[]))
 async def get_all_gifts_not_hidden(client): return await client(functions.payments.GetStarGiftsRequest(hash=0))
 async def get_client_not_started(S_NAME): return TelegramClient(session=f'session_{S_NAME}', api_id=api_id, api_hash=api_hash, device_model="iPhone 5s", system_version="12.5.8")
 async def payment_request(invoice, client): return await client(functions.payments.GetPaymentFormRequest(invoice=invoice, theme_params=None))
-
-def print_gradient_text(text):
-    print(Colorate.Vertical(Colors.blue_to_cyan, text))
+def print_gradient(text): print(Colorate.Vertical(Colors.blue_to_cyan, text))
 
 async def get_all_gifts_ids():
     async with AsyncClient() as client:
@@ -51,8 +67,8 @@ def get_gifts_all_id_array():
             return [int(g_id) for g_id in data.get("ids", [])]
     except (FileNotFoundError, ValueError, KeyError): return []
 
-async def get_client(session_name):
-    client = await get_client_not_started(session_name)
+async def get_client(s_name):
+    client = await get_client_not_started(s_name)
     await client.start()
     return client
 
@@ -195,30 +211,9 @@ async def runly():
 
 async def tosgs():
     while True:
-        os.system('cls' if os.name == 'nt' else 'clear')
-        title = """
- ███████████  █████████     ███████      █████████  █████ ██████████ ███████████ █████ █████
-▒▒███▒▒▒▒▒▒█ ███▒▒▒▒▒███  ███▒▒▒▒▒███   ███▒▒▒▒▒███▒▒███ ▒▒███▒▒▒▒▒█▒█▒▒▒███▒▒▒█▒▒███ ▒▒███ 
- ▒███   █ ▒ ▒███    ▒▒▒  ███     ▒▒███ ███     ▒▒▒  ▒███  ▒███  █ ▒ ▒   ▒███  ▒  ▒▒███ ███  
- ▒███████   ▒▒█████████ ▒███      ▒███▒███          ▒███  ▒██████       ▒███      ▒▒█████   
- ▒███▒▒▒█    ▒▒▒▒▒▒▒▒███▒███      ▒███▒███          ▒███  ▒███▒▒█       ▒███       ▒▒███    
- ▒███  ▒     ███    ▒███▒▒███     ███ ▒▒███     ███ ▒███  ▒███ ▒   █    ▒███        ▒███    
- █████      ▒▒█████████  ▒▒▒███████▒   ▒▒█████████  █████ ██████████    █████       █████   
-▒▒▒▒▒        ▒▒▒▒▒▒▒▒▒     ▒▒▒▒▒▒▒      ▒▒▒▒▒▒▒▒▒  ▒▒▒▒▒ ▒▒▒▒▒▒▒▒▒▒    ▒▒▒▒▒       ▒▒▒▒▒    
-
-                                                                                                    """
-        menu = """
-1. Parser
-2. Send Gift
-3. Utility
-4. NFT Parsing
-5. Register
-0. Leave
-
-"""
-
-        print_gradient_text(title)
-        print_gradient_text(menu)
+        system('cls' if name == 'nt' else 'clear')
+        print_gradient(title)
+        print_gradient(menu)
 
         match input(">>> "):
             case "1": await info_gifts()

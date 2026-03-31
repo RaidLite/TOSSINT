@@ -1,26 +1,28 @@
-import hashlib
-import os
-import re
 import socket
-import ssl
+
 import time
 from datetime import datetime
+from hashlib import md5
+from os import path, getcwd, makedirs, listdir
 from random import choice, randint
+from re import sub
 from socket import socket, AF_INET, SOCK_STREAM
+from ssl import get_server_certificate
 from string import ascii_letters, digits, punctuation
 from urllib import parse
 
-import dns.resolver
-import qrcode
-import requests
-import speedtest
+from OpenSSL import crypto
 from PIL import Image
 from PIL.ExifTags import TAGS
 from bs4 import BeautifulSoup
+from dns.resolver import Resolver, NXDOMAIN
 from faker import Faker
 from pystyle import Colors, Colorate
 from pytube import YouTube
+from qrcode import QRCode, constants
 from requests import get
+from requests import head, ConnectionError, RequestException, exceptions
+from speedtest import Speedtest
 
 links = {
     "raw.githubusercontent.com/srusahi/femoz/e44adac46e8a2f4d38c974cee092671700844f82/Base/God_eye_basedata.txt",
@@ -31,45 +33,43 @@ links = {
 }
 
 translit_dict = {
-        "а": "@", "б": "Б", "в": "B", "г": "г", "д": "д", "е": "е", "ё": "ё", "ж": "ж", "з": "3", "и": "u",
-        "й": "й", "к": "K", "л": "л", "м": "M", "н": "H", "о": "0", "п": "п", "р": "P", "с": "c", "т": "T",
-        "у": "y", "ф": "ф", "х": "X", "ц": "ц", "ч": "4", "ш": "ш", "щ": "щ", "ъ": "ъ", "ы": "ы", "ь": "ь",
-        "э": "э", "ю": "ю", "я": "я", "А": "A", "Б": "6", "В": "V", "Г": "r", "Д": "D", "Е": "E", "Ё": "Ё",
-        "Ж": "Ж", "З": "2", "И": "I", "Й": "Й", "К": "K", "Л": "Л", "М": "M", "Н": "H", "О": "O", "П": "П",
-        "Р": "P", "С": "C", "Т": "T", "У": "Y", "Ф": "Ф", "Х": "X", "Ц": "Ц", "Ч": "Ч", "Ш": "Ш", "Щ": "Щ",
-        "Ъ": "Ъ", "Ы": "bl", "Ь": "b", "Э": "Э", "Ю": "9Y", "Я": "9A",
+    "а": "@", "б": "Б", "в": "B", "г": "г", "д": "д", "е": "е", "ё": "ё", "ж": "ж", "з": "3", "и": "u",
+    "й": "й", "к": "K", "л": "л", "м": "M", "н": "H", "о": "0", "п": "п", "р": "P", "с": "c", "т": "T",
+    "у": "y", "ф": "ф", "х": "X", "ц": "ц", "ч": "4", "ш": "ш", "щ": "щ", "ъ": "ъ", "ы": "ы", "ь": "ь",
+    "э": "э", "ю": "ю", "я": "я", "А": "A", "Б": "6", "В": "V", "Г": "r", "Д": "D", "Е": "E", "Ё": "Ё",
+    "Ж": "Ж", "З": "2", "И": "I", "Й": "Й", "К": "K", "Л": "Л", "М": "M", "Н": "H", "О": "O", "П": "П",
+    "Р": "P", "С": "C", "Т": "T", "У": "Y", "Ф": "Ф", "Х": "X", "Ц": "Ц", "Ч": "Ч", "Ш": "Ш", "Щ": "Щ",
+    "Ъ": "Ъ", "Ы": "bl", "Ь": "b", "Э": "Э", "Ю": "9Y", "Я": "9A",
 }
 
+def sanitize_filename(filename): return sub(r'[\\/*?:"<>|]', "_", filename)
+def generate_password(n, s): return ''.join(choice(get_characters(s)) for _ in range(n))
+def transform_text(t): return ''.join(translit_dict.get(c, c) for c in t)
+def getdb(): print("Your databases:"); print(*[f"- {l}" for l in links], sep="\n")
+
 def dns_lookup(domain):
-    resolver = dns.resolver.Resolver(configure=False)
+    resolver = Resolver(configure=False)
     resolver.nameservers = ['8.8.8.8', '8.8.4.4']
     try:
         result = resolver.resolve(domain, 'A')
         print(f"IP addresses for {domain}:")
-        for ipval in result:
-            print(f" - {ipval.to_text()}")
-    except dns.resolver.NXDOMAIN:
+        for ipval in result: print(f" - {ipval.to_text()}")
+    except NXDOMAIN:
         print(f"Could not resolve {domain}")
     except Exception as e:
         print(f"An error occurred: {e}")
     input("Press Enter to return to the menu...")
 
+
 def ip_lookup(ip):
     try:
-        response = requests.get(f"https://ipinfo.io/{ip}/json")
-        if response.status_code == 200:
-            data = response.json()
-            print(f"IP: {data.get('ip', 'N/A')}")
-            print(f"Hostname: {data.get('hostname', 'N/A')}")
-            print(f"City: {data.get('city', 'N/A')}")
-            print(f"Region: {data.get('region', 'N/A')}")
-            print(f"Country: {data.get('country', 'N/A')}")
-            print(f"Location: {data.get('loc', 'N/A')}")
-            print(f"Org: {data.get('org', 'N/A')}")
-            print(f"Postal: {data.get('postal', 'N/A')}")
-            print(f"Timezone: {data.get('timezone', 'N/A')}")
+        r = get(f"https://ipinfo.io/{ip}/json")
+        if r.status_code == 200:
+            d = r.json()
+            for k in ("ip","hostname","city","region","country","loc","org","postal","timezone"):
+                print(f"{k.capitalize()}: {d.get(k,'N/A')}")
         else:
-            print(f"Error: {response.status_code} - {response.text}")
+            print(f"Error: {r.status_code} - {r.text}")
     except Exception as e:
         print(f"IP lookup failed for {ip}: {e}")
     input("Press Enter to return to the menu...")
@@ -78,29 +78,32 @@ def ip_lookup(ip):
 def image_metadata(image_path):
     try:
         image = Image.open(image_path)
-        exif_data = image._getexif()
+        exif_data = image.getexif()
 
         if not exif_data:
             print(f"No EXIF metadata found in {image_path}")
+            input("Press Enter to return to the menu...")
             return
 
-        metadata = {}
-        for tag, value in exif_data.items():
-            tag_name = TAGS.get(tag, tag)
-            metadata[tag_name] = value
-
-        for key, val in metadata.items():
-            print(f"{key}: {val}")
+        for tag_id, value in exif_data.items():
+            tag_name = TAGS.get(tag_id, tag_id)
+            if isinstance(value, bytes):
+                try:
+                    value = value.decode()
+                except UnicodeDecodeError:
+                    value = value.hex()
+            print(f"{tag_name}: {value}")
 
     except Exception as e:
         print(f"Failed to extract metadata from {image_path}: {e}")
+    input("Press Enter to return to the menu...")
 
 
 def data_breach_lookup(email):
     try:
         url = f"https://haveibeenpwned.com/api/v3/breachedaccount/{email}"
         headers = {"hibp-api-key": "YOUR_API_KEY"}
-        response = requests.get(url, headers=headers)
+        response = get(url, headers=headers)
         if response.status_code == 200:
             breaches = response.json()
             if breaches:
@@ -117,71 +120,77 @@ def data_breach_lookup(email):
 
 
 def scan_port(ip, port):
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.settimeout(1)
-    try:
-        s.connect((ip, port))
-        return True
-    except:
-        return False
-    finally:
-        s.close()
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM); s.settimeout(1)
+    try: return s.connect_ex((ip, port)) == 0
+    finally: s.close()
 
 
 def port_scan(ip):
-    print(Colorate.Horizontal(Colors.green_to_white, f"Scanning {ip} for open ports (expected time ~2 minutes)..."))
-    start_time = datetime.now()
-    open_ports = []
+    print(Colorate.Horizontal(Colors.green_to_white,
+          f"Scanning {ip} for open ports (expected time ~2 minutes)..."))
 
-    for port in range(1, 1025):
-        if scan_port(ip, port):
-            open_ports.append(port)
+    start = datetime.now()
+    open_ports = [p for p in range(1, 1025) if s_port(ip, str(p))]
+    duration = datetime.now() - start
 
-    end_time = datetime.now()
-    total_time = end_time - start_time
-
-    print(Colorate.Horizontal(Colors.green_to_white, f"\nScan completed in {total_time}\n"))
+    print(Colorate.Horizontal(Colors.green_to_white,
+          f"\nScan completed in {duration}\n"))
 
     if open_ports:
         print(Colorate.Horizontal(Colors.green_to_white, "Open ports:"))
-        for port in open_ports:
-            print(Colorate.Horizontal(Colors.green_to_white, f"Port {port} is open"))
+
+        lines = "\n".join(f"Port {p} is open" for p in open_ports)
+        print(Colorate.Horizontal(Colors.green_to_white, lines))
     else:
         print(Colorate.Horizontal(Colors.green_to_white, "No open ports found"))
 
     input(Colorate.Horizontal(Colors.green_to_white, "\nPress Enter to return to the menu..."))
 
-
 def url_availability_check(url):
     try:
-        response = requests.get(url)
-        if response.status_code == 200:
-            print(f"The URL {url} is reachable.")
-        else:
-            print(f"The URL {url} is not reachable. Status code: {response.status_code}")
-    except requests.ConnectionError:
-        print(f"The URL {url} is not reachable. Failed to establish a connection.")
+        r = get(url)
+        print(f"The URL {url} is reachable." if r.status_code == 200
+              else f"The URL {url} is not reachable. Status code: {r.status_code}")
+    except ConnectionError: print(f"The URL {url} is not reachable. Failed to establish a connection.")
     input("Press Enter to return to the menu...")
 
 
 def ssl_certificate_check(url):
     try:
-        cert = ssl.get_server_certificate((url, 443))
-        x509 = ssl.create_x509_from_der(ssl.PEM_cert_to_DER_cert(cert))
-        subject = dict(x509.get_subject().get_components())
-        issuer = dict(x509.get_issuer().get_components())
+        cert_pem = get_server_certificate((url, 443))
+        x509 = crypto.load_certificate(crypto.FILETYPE_PEM, cert_pem.encode())
+
+        subject = dict(
+            (k.decode(), v.decode())
+            for k, v in x509.get_subject().get_components()
+        )
+        issuer = dict(
+            (k.decode(), v.decode())
+            for k, v in x509.get_issuer().get_components()
+        )
+
+        valid_from = datetime.strptime(
+            x509.get_notBefore().decode(), "%Y%m%d%H%M%SZ"
+        )
+        valid_until = datetime.strptime(
+            x509.get_notAfter().decode(), "%Y%m%d%H%M%SZ"
+        )
+
         print(f"Subject: {subject}")
         print(f"Issuer: {issuer}")
-        print(f"Valid from: {x509.get_notBefore()}")
-        print(f"Valid until: {x509.get_notAfter()}")
+        print(f"Valid from: {valid_from}")
+        print(f"Valid until: {valid_until}")
+        print(f"Expired: {x509.has_expired()}")
+
     except Exception as e:
         print(f"Failed to retrieve SSL certificate for {url}: {e}")
+
     input("Press Enter to return to the menu...")
 
 
 def http_headers_extraction(url):
     try:
-        response = requests.head(url)
+        response = head(url)
         print(f"HTTP headers for {url}:")
         for key, value in response.headers.items():
             print(f"{key}: {value}")
@@ -193,7 +202,6 @@ def http_headers_extraction(url):
 def server_response_time_check(url):
     try:
         start_time = time.time()
-        response = requests.get(url)
         end_time = time.time()
         response_time = end_time - start_time
         print(f"Server response time for {url}: {response_time} seconds")
@@ -201,29 +209,33 @@ def server_response_time_check(url):
         print(f"Failed to measure server response time for {url}: {e}")
     input("Press Enter to return to the menu...")
 
-
 def html_parser(url):
     max_retries = 3
     retry_delay = 5
 
-    def sanitize_filename(filename):
-        return re.sub(r'[\\/*?:"<>|]', "_", filename)
-
     for attempt in range(max_retries):
         try:
-            response = requests.get(url, timeout=10)
+            response = get(url, timeout=10)
             response.raise_for_status()
+
             soup = BeautifulSoup(response.content, 'html.parser')
             file_name = sanitize_filename(
-                f"{url.replace('https://', '').replace('http://', '').replace('/', '_')}.html")
+                f"{url.replace('https://', '').replace('http://', '').replace('/', '_')}.html"
+            )
+
             with open(file_name, 'w', encoding='utf-8') as file:
                 file.write(soup.prettify())
+
             print(f"HTML content saved to {file_name}")
             break
-        except requests.exceptions.Timeout:
+
+        except exceptions.Timeout:
             print(f"Failed to parse HTML for {url}: Request timed out.")
-        except requests.exceptions.HTTPError as e:
-            if response.status_code == 429:
+
+        except exceptions.HTTPError as e:
+            status_code = e.response.status_code if e.response else None
+
+            if status_code == 429:
                 if attempt < max_retries - 1:
                     print(f"Failed to parse HTML for {url}: {e}. Retrying in {retry_delay} seconds...")
                     time.sleep(retry_delay)
@@ -232,12 +244,15 @@ def html_parser(url):
             else:
                 print(f"Failed to parse HTML for {url}: {e}")
                 break
-        except requests.exceptions.RequestException as e:
+
+        except exceptions.RequestException as e:
             print(f"Failed to parse HTML for {url}: {e}")
             break
+
         except OSError as e:
             print(f"Failed to save HTML for {url}: {e}")
             break
+
     input("Press Enter to return to the menu...")
 
 
@@ -245,7 +260,7 @@ def github_repo_parser(url):
     try:
 
         repo_api_url = url.replace("github.com", "api.github.com/repos")
-        response = requests.get(repo_api_url, timeout=10)
+        response = get(repo_api_url, timeout=10)
         response.raise_for_status()
         repo_info = response.json()
 
@@ -274,24 +289,24 @@ def github_repo_parser(url):
         print(f"Repository information saved to {repo_info_file_name}")
 
         contents_api_url = f"{repo_api_url}/contents"
-        response = requests.get(contents_api_url, timeout=10)
+        response = get(contents_api_url, timeout=10)
         response.raise_for_status()
         contents = response.json()
 
         local_dir = repo_name
-        if not os.path.exists(local_dir):
-            os.makedirs(local_dir)
+        if not path.exists(local_dir):
+            makedirs(local_dir)
 
         for content in contents:
             if content['type'] == 'file':
                 file_url = content['download_url']
-                file_path = os.path.join(local_dir, content['name'])
-                file_response = requests.get(file_url, timeout=10)
+                file_path = path.join(local_dir, content['name'])
+                file_response = get(file_url, timeout=10)
                 with open(file_path, 'wb') as file:
                     file.write(file_response.content)
                 print(f"Saved {content['name']} to {file_path}")
 
-    except requests.RequestException as e:
+    except RequestException as e:
         print(f"Failed to retrieve repository information for {url}: {e}")
     except Exception as e:
         print(f"Failed to parse repository information for {url}: {e}")
@@ -299,7 +314,7 @@ def github_repo_parser(url):
 
 
 def get_file_hash(file_path):
-    hash_md5 = hashlib.md5()
+    hash_md5 = md5()
     with open(file_path, "rb") as f:
         for chunk in iter(lambda: f.read(4096), b""):
             hash_md5.update(chunk)
@@ -307,8 +322,8 @@ def get_file_hash(file_path):
 
 
 def choose_file_from_directory():
-    current_directory = os.getcwd()
-    files = [f for f in os.listdir(current_directory) if os.path.isfile(os.path.join(current_directory, f))]
+    current_directory = getcwd()
+    files = [f for f in listdir(current_directory) if path.isfile(path.join(current_directory, f))]
     if not files:
         print("В текущем каталоге не найдено файлов.")
         return None
@@ -321,23 +336,18 @@ def choose_file_from_directory():
         try:
             choice = int(input("Введите номер файла для сканирования: "))
             if 1 <= choice <= len(files):
-                return os.path.join(current_directory, files[choice - 1])
+                return path.join(current_directory, files[choice - 1])
             else:
                 print("Неверный выбор. Пожалуйста, введите номер из списка.")
         except ValueError:
             print("Неверный ввод. Пожалуйста, введите корректное число.")
 
+
 def generate_qr_code():
     data = input("Enter the data to encode in the QR code: ")
-    qr = qrcode.QRCode(
-        version=1,
-        error_correction=qrcode.constants.ERROR_CORRECT_L,
-        box_size=10,
-        border=4,
-    )
+    qr = QRCode(version=1, error_correction=constants.ERROR_CORRECT_L, box_size=10, border=4,)
     qr.add_data(data)
     qr.make(fit=True)
-
     img = qr.make_image(fill='black', back_color='white')
     file_path = "qrcode.png"
     img.save(file_path)
@@ -346,11 +356,10 @@ def generate_qr_code():
 
 
 def check_internet_speed():
-    st = speedtest.Speedtest()
+    st = Speedtest()
     st.download()
     st.upload()
     st.results.share()
-
     results = st.results.dict()
     print(f"Download speed: {results['download'] / 1_000_000:.2f} Mbps")
     print(f"Upload speed: {results['upload'] / 1_000_000:.2f} Mbps")
@@ -361,81 +370,42 @@ def check_internet_speed():
 def download_youtube_video(url):
     try:
         yt = YouTube(url)
-        stream = yt.streams.get_highest_resolution()
         print(f"Downloading: {yt.title}")
-        stream.download()
+        yt.streams.get_highest_resolution().download()
         print("Download completed.")
-    except Exception as e:
-        print(f"An error occurred: {e}")
-
-def get_characters(strength):
-    characters = ascii_letters + digits
-    if strength == "medium":
-        characters += "!@#$%^&*()qwertyuiopasdfghjklzxcvbnm,./;[]йцукенгшщзхъфывапролдячсмить"
-    elif strength == "high":
-        characters += punctuation
-    return characters
-
-def getdb():
-    print("Your databases:")
-    for link in links:
-        print(f"- {link}")
-
-def generate_password(length, strength):
-    characters = get_characters(strength)
-    password = ''.join(choice(characters) for i in range(length))
-    return password
+    except Exception as e: print(f"An error occurred: {e}")
 
 
-def transform_text(input_text):
-    transformed_text = []
-    for char in input_text:
-        if char in translit_dict:
-            transformed_text.append(translit_dict[char])
-        else:
-            transformed_text.append(char)
-    return "".join(transformed_text)
+def get_characters(s):
+    c = ascii_letters + digits
+    return c + ("!@#$%^&*()qwertyuiopasdfghjklzxcvbnm,./;[]йцукенгшщзхъфывапролдячсмить" if s=="medium" else punctuation if s=="high" else "")
 
-
-def scan_port(port, host="127.0.0.1"):
-    sock = socket(AF_INET, SOCK_STREAM)
-    result = sock.connect_ex((host, int(port)))
-    sock.close()
-    return result == 0
+def s_port(p, host="127.0.0.1"):
+    s = socket(AF_INET, SOCK_STREAM)
+    ok = s.connect_ex((host, int(p))) == 0
+    s.close()
+    return ok
 
 
 def get_proxy_list():
-    proxy_api_url = "https://api.proxyscrape.com/v2/?request=getproxies&protocol=http&timeout=10000&country=all"
     try:
-        response = get(proxy_api_url)
-        if response.status_code == 200:
-            return response.text.strip().split("\r\n")
-        else:
-            return f"Ошибка: {response.status_code}"
-    except Exception as e:
-        return f"Ошибка: {e}"
+        r = get("https://api.proxyscrape.com/v2/?request=getproxies&protocol=http&timeout=10000&country=all")
+        return r.text.strip().split("\r\n") if r.status_code == 200 else f"Ошибка: {r.status_code}"
+    except Exception as e: return f"Ошибка: {e}"
 
 
-def mac_lookup(mac_address):
-    api_url = f"https://api.macvendors.com/{mac_address}"
+def mac_lookup(mac):
     try:
-        response = get(api_url)
-        if response.status_code == 200:
-            return response.text.strip()
-        else:
-            return f"Error: {response.status_code}"
-    except Exception as e:
-        return f"Error: {e}"
+        r = get(f"https://api.macvendors.com/{mac}")
+        return r.text.strip() if r.status_code == 200 else f"Error: {r.status_code}"
+    except Exception as e: return f"Error: {e}"
 
 
-def send_request(url, user_agents, i):
-    user_agent = choice(user_agents)
-    headers = {"User-Agent": user_agent}
+def send_request(url, agents, i):
     try:
-        response = get(url, headers=headers)
-        return f"Request {i} sent successfully, status: {response.status_code}"
-    except Exception as e:
-        return f"Request {i} failed: {e}"
+        r = get(url, headers={"User-Agent": choice(agents)})
+        return f"Request {i} OK: {r.status_code}"
+    except Exception as e: return f"Request {i} failed: {e}"
 
 
 def crawl_website(start_url, max_depth=2):
@@ -510,50 +480,32 @@ def generate_random_person(gender=None):
     }
 
 
-def generate_checksum(card_number):
-    digits = [int(x) for x in card_number]
-    odd_digits = digits[-2::-2]
-    even_digits = digits[-1::-2]
-    checksum = sum(odd_digits)
-    for digit in even_digits:
-        checksum += sum(divmod(digit * 2, 10))
-    return (10 - checksum % 10) % 10
+def generate_checksum(n):
+    d = list(map(int, n))
+    s = sum(d[-2::-2]) + sum(sum(divmod(x*2, 10)) for x in d[-1::-2])
+    return (10 - s % 10) % 10
 
 
 def generate_card_number():
-    bin_number = "4"
-    for _ in range(5):
-        bin_number += str(randint(0, 9))
-    account_number = ''.join(str(randint(0, 9)) for _ in range(9))
-    card_number = bin_number + account_number
-    checksum = generate_checksum(card_number)
-    card_number += str(checksum)
-    return card_number
+    n = "4" + ''.join(str(randint(0,9)) for _ in range(14))
+    return n + str(generate_checksum(n))
 
 
 def generate_card(country="Россия"):
-    month = randint(1, 12)
-    year = randint(24, 30)
-    expiry_date = "{:02d}/{:02d}".format(month, year)
-    cvv = ''.join(str(randint(0, 9)) for _ in range(3))
+    m, y = randint(1,12), randint(24,30)
     return {
         "Страна": country,
         "Номер карты": generate_card_number(),
-        "Срок действия": expiry_date,
-        "CVV": cvv
+        "Срок действия": f"{m:02d}/{y:02d}",
+        "CVV": ''.join(str(randint(0,9)) for _ in range(3))
     }
 
-def generate_phone_number(country_code):
-    match country_code:
-        case "1":
-            return f"+1 {randint(200, 999)}-{randint(200, 999)}-{randint(1000, 9999)}"
-        case "2":
-            return f"+7 {randint(900, 999)} {randint(100, 999)}-{randint(10, 99)}-{randint(10, 99)}"
-        case "3":
-            return f"+7 {randint(700, 709)} {randint(100, 999)}-{randint(10, 99)}-{randint(10, 99)}"
-        case "4":
-            return f"+375 {randint(25, 33)} {randint(100, 999)}-{randint(100, 999)}"
-        case "5":
-            return f"+234 {randint(700, 799)} {randint(100, 999)}-{randint(1000, 9999)}"
-        case _:
-            return None
+
+def generate_phone_number(c):
+    return {
+        "1": f"+1 {randint(200,999)}-{randint(200,999)}-{randint(1000,9999)}",
+        "2": f"+7 {randint(900,999)} {randint(100,999)}-{randint(10,99)}-{randint(10,99)}",
+        "3": f"+7 {randint(700,709)} {randint(100,999)}-{randint(10,99)}-{randint(10,99)}",
+        "4": f"+375 {randint(25,33)} {randint(100,999)}-{randint(100,999)}",
+        "5": f"+234 {randint(700,799)} {randint(100,999)}-{randint(1000,9999)}"
+    }.get(c)
