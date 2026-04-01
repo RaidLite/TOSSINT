@@ -11,8 +11,8 @@ from telethon import (
     errors
 )
 from tqdm.asyncio import tqdm
-from osint.tools.settings import session_name, tosgs_menu, tosgs_title, url, api_id, api_hash, path_json, path_nft_json, nft_ids, folder_json
-from osint.tools.utils import cls, print_gradient, save
+from o.t.settings import session_name, tosgs_menu, tosgs_title, url, api_id, api_hash, path_json, path_nft_json, nft_ids, folder_json
+from o.t.utils import cls, print_gradient, save
 
 def get_sessions(): return sorted([f.replace('session_', '').replace('.session', '') for f in listdir('TOSGS') if f.startswith('session_') and f.endswith('.session')])
 async def get_invoice(peer, g_id): return types.InputInvoiceStarGift(hide_name=False, include_upgrade=False, peer=peer, gift_id=g_id, message=types.TextWithEntities(text="", entities=[]))

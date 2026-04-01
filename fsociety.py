@@ -1,19 +1,20 @@
 from asyncio import run
 from sys import exit
-from osint.dnint import dns_lookup, ip_lookup, image_metadata, data_breach_lookup, port_scan, url_availability_check, \
+from o.d import dns_lookup, ip_lookup, image_metadata, data_breach_lookup, port_scan, url_availability_check, \
     ssl_certificate_check, http_headers_extraction, server_response_time_check, html_parser, github_repo_parser, \
     download_youtube_video, transform_text, check_internet_speed, getdb, s_port, mac_lookup, crawl_website, \
     get_proxy_list
-from osint.tools.utils import cls
+from o.t.utils import cls
 from pystyle import Center, Colorate, Colors
-from osint.tools.settings import fsociety_title, variants
-from osint.tools.gen import gg, print_gradient_text
-from osint.tools.numb import *
-from osint.socmint import check_username, run_sherlock
-from osint.emailint import run_holehe
-from osint.tools.tosgs import tosgs
-from osint.tools.gen import generate_qr_code, gen_pass, generate_random_person, generate_card, generate_phone_number
-from osint.tools.manual import manual
+from o.t.settings import fsociety_title, variants
+from o.t.g import gg, print_gradient_text
+from o.t.n import *
+from o.s import check_username, run_sherlock
+from o.e import run_holehe
+from o.t.t import tosgs
+from o.t.g import generate_qr_code, gen_pass, generate_random_person, generate_card, generate_phone_number
+from o.t.m import manual
+
 def main():
     cls()
     print_gradient_text(Center.XCenter(fsociety_title))

@@ -1,9 +1,8 @@
 from asyncio import run, gather
 from typing import Any
-from osint.tools.utils import get_now
+from o.t.utils import get_now
 from holehe.core import import_submodules, get_functions, launch_module
 from httpx import AsyncClient
-
 
 def run_holehe(email: str) -> dict[str, Any]:
     async def _exec():
@@ -17,7 +16,9 @@ def run_holehe(email: str) -> dict[str, Any]:
 
     try:
         raw = run(_exec())
-        found = [{"service": r.get("name"), "recovery": r.get("emailrecovery"), "phone": r.get("phoneNumber")} for r in
+        found = [
+            {"service": r.get("name"), "recovery": r.get("emailrecovery"),
+             "phone": r.get("phoneNumber")} for r in
                  raw if isinstance(r, dict) and r.get("exists")]
         return {"tool": "holehe", "email": email, "timestamp": get_now(),
                 "data": {"found_count": len(found), "found": found,
