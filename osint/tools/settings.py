@@ -20,7 +20,8 @@ links = {
     "raw.githubusercontent.com/Karen-HUB-git/STRANGER_PRIVATE2/2af0f86f29037bf9abbe3b130a5c988d8ebe3f70/PAS1k.txt",
     "github.com/shikso81/honkai/raw/eb2fe07682823684c200ac14acf3384175dcb840/NatHack/database/QiWi.csv",
     "github.com/shikso81/honkai/raw/eb2fe07682823684c200ac14acf3384175dcb840/NatHack/database/russol.info.csv",
-    "drive.google.com/drive/folders/1YZYHUV3f8sgW6PQOqjCWmNWvKIxC5u0D"
+    "drive.google.com/drive/folders/1YZYHUV3f8sgW6PQOqjCWmNWvKIxC5u0D",
+    "github.com/RaidLite/woody"
 }
 
 translit_dict = {
@@ -47,24 +48,34 @@ title = """
 
 tosgs_title = title
 fsociety_title = title
+ttt = """
+          ███████████  █████████     ███████      █████████  █████ ██████████ ███████████ █████ █████
+         ▒▒███▒▒▒▒▒▒█ ███▒▒▒▒▒███  ███▒▒▒▒▒███   ███▒▒▒▒▒███▒▒███ ▒▒███▒▒▒▒▒█▒█▒▒▒███▒▒▒█▒▒███ ▒▒███ 
+          ▒███   █ ▒ ▒███    ▒▒▒  ███     ▒▒███ ███     ▒▒▒  ▒███  ▒███  █ ▒ ▒   ▒███  ▒  ▒▒███ ███  
+          ▒███████   ▒▒█████████ ▒███      ▒███▒███          ▒███  ▒██████       ▒███      ▒▒█████   
+          ▒███▒▒▒█    ▒▒▒▒▒▒▒▒███▒███      ▒███▒███          ▒███  ▒███▒▒█       ▒███       ▒▒███    
+          ▒███  ▒     ███    ▒███▒▒███     ███ ▒▒███     ███ ▒███  ▒███ ▒   █    ▒███        ▒███    
+          █████      ▒▒█████████  ▒▒▒███████▒   ▒▒█████████  █████ ██████████    █████       █████   
+         ▒▒▒▒▒        ▒▒▒▒▒▒▒▒▒     ▒▒▒▒▒▒▒      ▒▒▒▒▒▒▒▒▒  ▒▒▒▒▒ ▒▒▒▒▒▒▒▒▒▒    ▒▒▒▒▒       ▒▒▒▒▒    
+         
+                                                                                            """
 
 variants = """
-╔══════════════════════════════════════════════════════════════════════════════════════╗
-║ 1. DNS Lookup             12. GitHub parsing          24. Generate phone             ║
-║ 3. IP Lookup              13. Download video YT       25. Get Databases              ║
-║ 4. Image Metadata         14. Generated QR            26. Phone Full Info            ║
-║ 5. Data Breach Lookup     15. Internet speedtest      27. Phone Validator            ║
-║ 6. Port Scan              16. Generate password       28. Phone Formatter            ║
-║ 7. URL Avail. Check       17. Transform text          29. Phone Geo/Carrier          ║
-║ 8. SSL Cert Check         18. Scan single port        30. Extract Phones             ║
-║ 9. HTTP Headers           19. Get proxy list          31. Phone Examples             ║
-║ 10. Response Time         20. MAC lookup              32. Supported Regions          ║
-║ 11. HTML Parsing          21. Crawl website           33. Generator Tool             ║
-║ 36. Search by nickname    22. Generate person         34. Telegram Gift Parser       ║
-║ 37. Search by mail        23. Generate card           35. Search by nickname v2      ║
-║══════════════════════════════════════════════════════════════════════════════════════║
-║                                 0. Leave                                             ║
-╚══════════════════════════════════════════════════════════════════════════════════════╝
+                              ╔════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+                              ║ 1. DNS Lookup             12. GitHub parsing          24. Generate phone          11. HTML Parsing             ║
+                              ║ 3. IP Lookup              13. Download video YT       25. Get Databases           36. Search by nickname       ║
+                              ║ 4. Image Metadata         14. Generated QR            26. Phone Full Info         37. Search by mail           ║
+                              ║ 5. Data Breach Lookup     15. Internet speedtest      27. Phone Validator         38. Manuals                  ║                                                   
+                              ║ 6. Port Scan              16. Generate password       28. Phone Formatter         21. Crawl website            ║
+                              ║ 7. URL Avail. Check       17. Transform text          29. Phone Geo/Carrier       22. Generate person          ║
+                              ║ 8. SSL Cert Check         18. Scan single port        30. Extract Phones          23. Generate card            ║
+                              ║ 9. HTTP Headers           19. Get proxy list          31. Phone Examples          33. Generator Tool           ║
+                              ║ 10. Response Time         20. MAC lookup              32. Supported Regions       34. Telegram Gift Parser     ║
+                              ║════════════════════════════════════════════════════════════════════════════════════════════════════════════════║
+                              ║                                         35. Search by nickname v2                                              ║
+                              ║════════════════════════════════════════════════════════════════════════════════════════════════════════════════║
+                              ║                                                 0. Leave                                                       ║
+                              ╚════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
 """
 
 menu = """

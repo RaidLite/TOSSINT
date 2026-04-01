@@ -13,7 +13,7 @@ from osint.socmint import check_username, run_sherlock
 from osint.emailint import run_holehe
 from osint.tools.tosgs import tosgs
 from osint.tools.gen import generate_qr_code, gen_pass, generate_random_person, generate_card, generate_phone_number
-
+from osint.tools.manual import manual
 def main():
     cls()
     print_gradient_text(Center.XCenter(fsociety_title))
@@ -147,6 +147,9 @@ def main():
         case '32':
             print(f"Regions: {get_supported_regions()}")
             print(f"Codes: {get_supported_calling_codes()}")
+
+        case '38':
+            run(manual())
 
         case _: print("Invalid choice. Please select a valid option.")
 
