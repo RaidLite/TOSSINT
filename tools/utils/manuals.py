@@ -2,8 +2,8 @@ from sys import exit
 
 from pystyle import Center
 
-from o.t.settings import ttt, vvv, color_code
-from o.t.utils import print_gradient, cls
+from tools.utils.settings import ttt, vvv, color_code
+from tools.utils.utils import print_gradient, cls
 
 async def manual():
     cls()
@@ -272,7 +272,7 @@ async def manual():
         [!] Содержимое раздела:
 
         • Lampyre (https://account.lampyre.io/email-and-phone-lookup) — веб
-        версия поиска по любому номеру телефона, поиск по аккаунтам и телефонной книге - от себя: полезная вещь в o-сфере, не раз спасала меня.
+        версия поиска по любому номеру телефона, поиск по аккаунтам и телефонной книге - от себя: полезная вещь в tools-сфере, не раз спасала меня.
         • Getcontact (https://getcontact.com/) — найдет информацию о том как записан номер в контактах - от себя: Сайт хороший, но я думаю, что бот в телеграмме будет на много удобнее для Вас.
         • Truecaller (https://www.truecaller.com/) — телефонная книга, найдет имя и оператора телефона - от себя: Вещь годная, но долго возиться
         • Bullshit (https://mirror.bullshit.agency/) — поиск объявлений по номеру телефона - Иногда нужен VPN
@@ -1807,7 +1807,7 @@ async def manual():
         Данный мануал посвящён для пробивов по IP
 
         Начинаем:
-        1. HostHunter (t) — обнаружение и извлечение имен хостов из набора целевых IP-адресов
+        1. HostHunter (utils) — обнаружение и извлечение имен хостов из набора целевых IP-адресов
         2. censys.io — находит какие серверы и устройства выставлены в сети
         3. cyberhubarchive — архив утекших данных, в нем есть IP адреса аккаунтов Skype
         4. spiderfoot.net (r) — автоматический поиск с использованием огромного количества методов, нужно использовать в облаке если пройти регистрацию
@@ -2158,7 +2158,7 @@ async def manual():
 
         1. binlist.net — определит к какому банку принадлежит карта
         2. bindb.com — определит к какому банку принадлежит карта
-        3. Scylla (https://github.com/josh0xA/Scylla) (t) — найдет упоминания номера карты в утечках
+        3. Scylla (https://github.com/josh0xA/Scylla) (utils) — найдет упоминания номера карты в утечках
         """)
 
         elif select == '58':

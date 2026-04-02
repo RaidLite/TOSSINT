@@ -1,19 +1,21 @@
 from asyncio import run
 from sys import exit
-from o.d import dns_lookup, ip_lookup, image_metadata, data_breach_lookup, port_scan, url_availability_check, \
+
+from pystyle import Center, Colorate, Colors
+
+from tools.dnint import dns_lookup, ip_lookup, image_metadata, data_breach_lookup, port_scan, url_availability_check, \
     ssl_certificate_check, http_headers_extraction, server_response_time_check, html_parser, github_repo_parser, \
     download_youtube_video, transform_text, check_internet_speed, getdb, s_port, mac_lookup, crawl_website, \
     get_proxy_list
-from o.t.utils import cls
-from pystyle import Center, Colorate, Colors
-from o.t.settings import fsociety_title, variants
-from o.t.g import gg, print_gradient_text
-from o.t.n import *
-from o.s import check_username, run_sherlock
-from o.e import run_holehe
-from o.t.t import tosgs
-from o.t.g import generate_qr_code, gen_pass, generate_random_person, generate_card, generate_phone_number
-from o.t.m import manual
+from tools.emailint import run_holehe
+from tools.socmint import check_username, run_sherlock
+from tools.utils.gen import generate_qr_code, gen_pass, generate_random_person, generate_card, generate_phone_number
+from tools.utils.gen import gg, print_gradient_text
+from tools.utils.manuals import manual
+from tools.utils.numbers import *
+from tools.utils.settings import fsociety_title, variants
+from tools.utils.utils import cls
+from tools.humint import humint_manual
 
 def main():
     cls()
@@ -21,29 +23,53 @@ def main():
     print_gradient_text(Center.XCenter(variants))
     print()
     match input("---> ").strip():
-        case '0': print("Exiting the program."); exit(0)
-        case '1': dns_lookup(input("Enter domain for DNS lookup: "))
-        case '3': ip_lookup(input("Enter IP for IP lookup: "))
-        case '4': image_metadata(input("Enter path to image for metadata extraction: "))
-        case '5': data_breach_lookup(input("Enter email for data breach lookup: "))
-        case '6': port_scan(input("Enter IP for port scan: "))
-        case '7': url_availability_check(input("Enter URL for availability check: "))
-        case '8': ssl_certificate_check(input("Enter URL for SSL certificate check: "))
-        case '9': http_headers_extraction(input("Enter URL for HTTP headers extraction: "))
-        case '10': server_response_time_check(input("Enter URL for server response time check: "))
-        case '11': html_parser(input("Enter URL for HTML parsing: "))
-        case '12': github_repo_parser(input("Enter GitHub repository URL: "))
-        case '13': download_youtube_video(input("Enter YouTube video URL: "))
-        case '14': generate_qr_code()
-        case '15': check_internet_speed()
-        case '16': print(gen_pass(int(input("Password length: ")), input("Strength (low/medium/high): ")))
-        case '17': print(transform_text(input("Enter text: ")))
-        case '18': print("Open" if s_port(input("Enter port: "), input("Enter host (default 127.0.0.1): ") or "127.0.0.1") else "Closed")
-        case '25': getdb()
-        case '33': gg()
-        case '34': run(tosgs())
-        case '20': print(mac_lookup(input("Enter MAC address: ")))
-        case '21': print("\n".join(crawl_website(input("Enter start URL: "))[:20]))
+        case '0':
+            print("Exiting the program."); exit(0)
+        case '1':
+            dns_lookup(input("Enter domain for DNS lookup: "))
+        case '2':
+            humint_manual()
+        case '3':
+            ip_lookup(input("Enter IP for IP lookup: "))
+        case '34':
+            image_metadata(input("Enter path to image for metadata extraction: "))
+        case '5':
+            data_breach_lookup(input("Enter email for data breach lookup: "))
+        case '6':
+            port_scan(input("Enter IP for port scan: "))
+        case '7':
+            url_availability_check(input("Enter URL for availability check: "))
+        case '8':
+            ssl_certificate_check(input("Enter URL for SSL certificate check: "))
+        case '9':
+            http_headers_extraction(input("Enter URL for HTTP headers extraction: "))
+        case '10':
+            server_response_time_check(input("Enter URL for server response time check: "))
+        case '11':
+            html_parser(input("Enter URL for HTML parsing: "))
+        case '12':
+            github_repo_parser(input("Enter GitHub repository URL: "))
+        case '13':
+            download_youtube_video(input("Enter YouTube video URL: "))
+        case '14':
+            generate_qr_code()
+        case '15':
+            check_internet_speed()
+        case '16':
+            print(gen_pass(int(input("Password length: ")), input("Strength (low/medium/high): ")))
+        case '17':
+            print(transform_text(input("Enter text: ")))
+        case '18':
+            print("Open" if s_port(input("Enter port: "),
+                                   input("Enter host (default 127.0.0.1): ") or "127.0.0.1") else "Closed")
+        case '25':
+            getdb()
+        case '33':
+            gg()
+        case '20':
+            print(mac_lookup(input("Enter MAC address: ")))
+        case '21':
+            print("\n".join(crawl_website(input("Enter start URL: "))[:20]))
         case '35':
             result = run(check_username(input("Username --> "), 500))
             print(Colorate.Horizontal(Colors.blue_to_cyan, result))
@@ -89,7 +115,6 @@ def main():
 
             print(Colorate.Horizontal(Colors.blue_to_cyan, result))
 
-
         case '19':
             proxies = get_proxy_list()
             print("\n".join(proxies[:10]) if isinstance(proxies, list) else proxies)
@@ -102,7 +127,8 @@ def main():
         case '23':
             for k, v in generate_card().items(): print(f"{k}: {v}")
 
-        case '24': print(generate_phone_number(input("Country code (1-5): ")))
+        case '24':
+            print(generate_phone_number(input("Country code (1-5): ")))
         case '26':
             num = input("Number: ")
             p = parse_safe(num)
@@ -152,7 +178,8 @@ def main():
         case '38':
             run(manual())
 
-        case _: print("Invalid choice. Please select a valid option.")
+        case _:
+            print("Invalid choice. Please select a valid option.")
 
     input("Press Enter to continue...")
 

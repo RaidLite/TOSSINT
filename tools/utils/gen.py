@@ -4,9 +4,9 @@ from faker import Faker
 from pystyle import Center
 from qrcode import QRCode
 from qrcode import constants
-from o.t.settings import title, headlines, bodies, menu
-from o.t.utils import cls
-from o.t.utils import print_gradient as print_gradient_text
+from tools.utils.settings import title, headlines, bodies, menu
+from tools.utils.utils import cls
+from tools.utils.utils import print_gradient as print_gradient_text
 
 fake = Faker()
 

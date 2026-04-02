@@ -1,20 +1,3 @@
-api_id = 21341528
-api_hash = "bf654fd64259c65b85c8899ff081a437"
-session_name = 'tosgs'
-folder_json = 'found'
-path_json = f'{folder_json}/ids.json'
-path_nft_json = f'{folder_json}/nft_ids.json'
-url = 'https://cdn.changes.tg/gifts/originals/'
-nft_ids = []
-tosgs_menu = """
-1. Parser
-2. Send Gift
-3. Utility
-4. NFT Parsing
-5. Register
-0. Leave
-
-"""
 links = {
     "raw.githubusercontent.com/srusahi/femoz/e44adac46e8a2f4d38c974cee092671700844f82/Base/God_eye_basedata.txt",
     "raw.githubusercontent.com/Karen-HUB-git/STRANGER_PRIVATE2/2af0f86f29037bf9abbe3b130a5c988d8ebe3f70/PAS1k.txt",
@@ -45,8 +28,6 @@ title = """
 ▒▒▒▒▒        ▒▒▒▒▒▒▒▒▒     ▒▒▒▒▒▒▒      ▒▒▒▒▒▒▒▒▒  ▒▒▒▒▒ ▒▒▒▒▒▒▒▒▒▒    ▒▒▒▒▒       ▒▒▒▒▒    
 
                                                                                             """
-
-tosgs_title = title
 fsociety_title = title
 ttt = """
           ███████████  █████████     ███████      █████████  █████ ██████████ ███████████ █████ █████
@@ -63,7 +44,7 @@ ttt = """
 variants = """
 ╔══════════════════════════════════════════════════════════════════════════════════════════════════════╗
 ║  1. DNS Lookup              12. GitHub Parsing         24. Generate Phone       33. Generator Tool   ║
-║  3. IP Lookup               13. Download Video YT      25. Get Databases        34. TG Gift Parser   ║
+║  3. IP Lookup               13. Download Video YT      25. Get Databases        34. Image Extraction ║
 ║  6. Port Scan               14. Generate QR            26. Phone Full Info      35. Nickname Search  ║
 ║  7. URL Avail. Check        15. Internet Speedtest     27. Phone Validator      36. Nick Search v2   ║
 ║  8. SSL Cert Check          16. Generate Password      28. Phone Formatter      37. Search by Mail   ║
@@ -71,9 +52,8 @@ variants = """
 ║  10. Response Time          18. Scan Single Port       30. Extract Phones       21. Crawl Website    ║
 ║  11. HTML Parsing           19. Get Proxy List         31. Phone Examples       22. Generate Person  ║
 ║  5. Data Breach             20. MAC Lookup             32. Supported Regions    23. Generate Card    ║
+║  2. Humint manual                                                                                    ║
 ╠══════════════════════════════════════════════════════════════════════════════════════════════════════╣
-║                                  4. Image Metadata Extraction                                        ║
-║══════════════════════════════════════════════════════════════════════════════════════════════════════║
 ║                                            0. Leave                                                  ║
 ╚══════════════════════════════════════════════════════════════════════════════════════════════════════╝
 """

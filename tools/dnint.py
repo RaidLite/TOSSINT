@@ -18,7 +18,7 @@ from pystyle import Colors, Colorate
 from pytube import YouTube
 from requests import head, ConnectionError, RequestException, exceptions, get
 from speedtest import Speedtest
-from o.t.settings import translit_dict, links
+from tools.utils.settings import translit_dict, links
 
 def sanitize_filename(filename): return sub(r'[\\/*?:"<>|]', "_", filename)
 def transform_text(t): return ''.join(translit_dict.get(c, c) for c in t)

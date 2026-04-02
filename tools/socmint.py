@@ -9,7 +9,7 @@ from typing import Any
 from sherlock_project.result import QueryStatus
 from sherlock_project.sherlock import sherlock, QueryNotifyPrint
 from sherlock_project.sites import SitesInformation
-from o.t.utils import get_now
+from tools.utils.utils import get_now
 
 def run_sherlock(username: str) -> dict[str, Any]:
     try:
