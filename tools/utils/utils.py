@@ -1,5 +1,7 @@
+import aiofiles
+
 from datetime import datetime
-from json import dump
+from json import dumps
 from os import system, name
 from pystyle import Colorate, Colors
 
@@ -13,4 +15,5 @@ def print_gradient(text):
     print(Colorate.Vertical(Colors.red_to_yellow, text))
 
 async def save(path, data):
-    with open(path, "w", encoding="utf-8") as f: dump(data, f, ensure_ascii=False, indent=4)
+    async with aiofiles.open(path, "w", encoding="utf-8") as f:
+        await f.write(dumps(data, ensure_ascii=False, indent=4))

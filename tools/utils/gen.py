@@ -1,3 +1,4 @@
+from datetime import date
 from random import uniform, randint, choices, choice
 from string import ascii_lowercase, ascii_letters, punctuation, digits, ascii_uppercase
 from faker import Faker
@@ -8,7 +9,7 @@ from tools.utils.settings import title, headlines, bodies, menu
 from tools.utils.utils import cls
 from tools.utils.utils import print_gradient as print_gradient_text
 
-fake = Faker()
+fake = Faker(locale="ru_RU")
 
 def generate_custom_password(length=12, use_uppercase=True, use_digits=True, use_symbols=True):
     characters = ascii_lowercase
@@ -87,44 +88,40 @@ def print_menu():
     print_gradient_text(Center.XCenter(title))
     print_gradient_text(Center.XCenter(menu))
 
+
 def generate_random_person(gender=None):
-    fake = Faker(locale="ru_RU")
-    if gender is None:
-        gender = choice(["М", "Ж"])
+    if gender is None: gender = choice(["М", "Ж"])
+
     if gender == "М":
         first_name = fake.first_name_male()
         middle_name = fake.middle_name_male()
+        last_name = fake.last_name_male()
     else:
         first_name = fake.first_name_female()
         middle_name = fake.middle_name_female()
-    last_name = fake.last_name()
+        last_name = fake.last_name_female()
+
     full_name = f"{last_name} {first_name} {middle_name}"
-    birthdate = fake.date_of_birth()
-    age = fake.random_int(min=18, max=80)
-    street_address = fake.street_address()
-    city = fake.city()
-    region = fake.region()
-    postcode = fake.postcode()
-    address = f"{street_address}, {city}, {region} {postcode}"
-    email = fake.email()
-    phone_number = fake.phone_number()
-    inn = str(fake.random_number(digits=12, fix_len=True))
-    snils = str(fake.random_number(digits=11, fix_len=True))
-    passport_num = str(fake.random_number(digits=10, fix_len=True))
-    passport_series = fake.random_int(min=1000, max=9999)
+    birthdate = fake.date_of_birth(minimum_age=18, maximum_age=80)
+    today = date.today()
+    age = today.year - birthdate.year - ((today.month, today.day) < (birthdate.month, birthdate.day))
+    address = f"{fake.postcode()}, {fake.region()}, г. {fake.city()}, {fake.street_address()}"
+
+    if gender == "М": formatted_gender = "Мужской"
+    else: formatted_gender = "Женский"
+
     return {
         "ФИО": full_name,
-        "Пол": gender,
-        "Дата рождения": birthdate.strftime('%d %B %Y'),
+        "Пол": formatted_gender,
+        "Дата рождения": birthdate.strftime('%d.%m.%Y'),
         "Возраст": age,
         "Адрес": address,
-        "Email": email,
-        "Телефон": phone_number,
-        "ИНН": inn,
-        "СНИЛС": snils,
-        "Паспорт": f"{passport_series} {passport_num}"
+        "Email": fake.free_email(),
+        "Телефон": fake.phone_number(),
+        "ИНН": fake.numerify("############"),
+        "СНИЛС": fake.numerify("###-###-### ##"),
+        "Паспорт": fake.numerify("## ## ######")
     }
-
 
 def generate_checksum(n):
     d = list(map(int, n))
